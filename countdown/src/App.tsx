@@ -14,7 +14,7 @@ import {
 import Letters from './Components/LetterCardComponent'
 
 const Styles = {
-  marginTop: "30px",
+  marginTop: "50px",
 
 }
 
@@ -51,7 +51,7 @@ function App() {
 
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
 
-      <Input style={Styles}></Input>
+      <Input style={Styles} w="250px"></Input>
     </Box>
   )
 }

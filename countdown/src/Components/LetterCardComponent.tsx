@@ -11,7 +11,7 @@ import {
 function Letters ()  {
     return(
         <Box>
-            <Flex justifyContent={"space-between"}>
+            <Flex justifyContent={"space-between"} gap="10px">
                 <Card w="100px" h="100px">
                     <Text fontSize="60px"></Text>
                 </Card>

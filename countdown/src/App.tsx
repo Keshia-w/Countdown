@@ -1,44 +1,58 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import axios from 'axios'
+import {
+  Box,
+  Text,
+  Button,
+  Grid,
+  Flex,
+  CircularProgress, 
+  CircularProgressLabel,
+  Input
+} from '@chakra-ui/react'
+import Letters from './Components/LetterCardComponent'
+
+const Styles = {
+  marginTop: "50px",
+
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
 
-  const fetchAPI = async () => {
-    const response = await axios.get("http://localhost:5050/api")
-    console.log(response.data.fruits)
-  };
+  // const fetchAPI = async () => {
+  //   const response = await axios.get("http://localhost:5050/api")
+  //   console.log(response.data.fruits)
+  // };
 
-  useEffect(() => {
-    fetchAPI();
-  }, []);
+  // useEffect(() => {
+  //   fetchAPI();
+  // }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Box alignItems={"center"}>
+
+      <Text fontSize={"50px"} fontWeight={"larger"}>Countdown</Text>
+
+      <Flex justifyContent="center" style={Styles}>
+        <Letters />
+      </Flex>
+
+      <Flex justifyContent="center" gap="80px" style={Styles}>
+          <Button>
+            Vowel
+          </Button>
+
+          <Button>
+            Consonant
+          </Button>
+      </Flex>
+
+      <Text style={Styles}>Enter all the words you can make from the letters!</Text>
+
+      <Input style={Styles} w="250px"></Input>
+    </Box>
   )
 }
 

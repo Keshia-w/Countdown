@@ -39,17 +39,27 @@ function App() {
   const points = 0;
   const vowels = ["A", "E", "I", "O", "U"];
   const consonants = ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
-  const {isOpen, onOpen, onClose} = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure({ defaultIsOpen: true});
+
+  //fucntion to increment rounds
+  // function startRound () => {
+  //   return(
+
+  //   )
+  // }
+
+  //function for
 
   return (
     <Box alignItems={"center"}>
 
-      <Button onClick={onOpen}>Open modal</Button>
-
+      {/* Learn how to play the game and start the first round */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent width="500px" height="300px" justifyContent={'space-between'} padding="30px">
           
+          <Text fontWeight="bold" fontSize="20px">Welcome to my coding test!</Text>
+
           <Text fontWeight="bold">Game Rules</Text>
 
           <Text>1. Select up to 10 vowels and consonants</Text>
@@ -66,19 +76,27 @@ function App() {
       <Text fontSize={"50px"} fontWeight={"larger"}>Countdown</Text>
 
       <Flex justifyContent="center" gap ="20px" style={Styles}>
+
         <Letters />
-        <CircularProgress size ="60px" marginTop="15px" color="green.400"></CircularProgress>
+
+        <CircularProgress size ="60px" marginTop="15px" color="green.400">
+          <CircularProgressLabel>{timer}</CircularProgressLabel>
+        </CircularProgress>
       </Flex>
 
+      {/* select up to 10 letters from each */}
       <Flex justifyContent="center" gap="80px" style={Styles}>
-          <Button>
+          <Button width="150px">
             Vowel
           </Button>
 
-          <Button>
+          <Button width="150px">
             Consonant
           </Button>
       </Flex>
+
+      {/* start after 10 letters selected */}
+      <Button marginTop="50px" backgroundColor="green" color="white" width="150px" onClick={onOpen}>Start Game!</Button>
 
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
 

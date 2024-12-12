@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
  
 function Letters ()  {
+
     return(
         <Box>
             <Flex justifyContent={"space-between"} gap="10px">

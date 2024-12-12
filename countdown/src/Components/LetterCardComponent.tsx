@@ -3,55 +3,25 @@ import {
     Box,
     Text,
     Flex,
-    Card,
-    CardBody
-
+    Card
 } from '@chakra-ui/react'
+
+type LettersProps = {
+    letters: string[];
+  };
  
-function Letters ()  {
+function Letters ({letters}: LettersProps)  {
 
     return(
         <Box>
             <Flex justifyContent={"space-between"} gap="10px">
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
-
-                <Card w="100px" h="100px">
-                    <Text fontSize="60px"></Text>
-                </Card>
+                {Array(10)
+                .fill("")
+                .map((_, index) => (
+                    <Card w="100px" h="100px" key={index}>
+                    <Text fontSize="60px">{letters[index] || ""}</Text>
+                    </Card>
+                ))}
             </Flex>
         </Box>
     )

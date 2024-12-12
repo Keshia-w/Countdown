@@ -10,6 +10,7 @@ import {
   CircularProgress, 
   CircularProgressLabel,
   Input,
+  Textarea,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -38,17 +39,31 @@ function App() {
   const timer = 0;
   const points = 0;
   const vowels = ["A", "E", "I", "O", "U"];
-  const consonants = ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
+  const consonants = 
+  ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", 
+  "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
+
+  const guesses = [""];
   const {isOpen, onOpen, onClose} = useDisclosure({ defaultIsOpen: true});
+  const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
 
-  //fucntion to increment rounds
-  // function startRound () => {
-  //   return(
+  //function for selecting letters
+  // Function to add a random vowel
+  const addVowel = () => {
+    if (selectedLetters.length < 10) {
+      const randomVowel = vowels[Math.floor(Math.random() * vowels.length)];
+      setSelectedLetters([...selectedLetters, randomVowel]);
+    }
+  };
 
-  //   )
-  // }
+  // Function to add a random consonant
+  const addConsonant = () => {
+    if (selectedLetters.length < 10) {
+      const randomConsonant = consonants[Math.floor(Math.random() * consonants.length)];
+      setSelectedLetters([...selectedLetters, randomConsonant]);
+    }
+  };
 
-  //function for
 
   return (
     <Box alignItems={"center"}>
@@ -77,20 +92,20 @@ function App() {
 
       <Flex justifyContent="center" gap ="20px" style={Styles}>
 
-        <Letters />
+        <Letters letters={selectedLetters}/>
 
         <CircularProgress size ="60px" marginTop="15px" color="green.400">
           <CircularProgressLabel>{timer}</CircularProgressLabel>
         </CircularProgress>
       </Flex>
 
-      {/* select up to 10 letters from each */}
+      {/* add letters */}
       <Flex justifyContent="center" gap="80px" style={Styles}>
-          <Button width="150px">
+          <Button width="150px" onClick={addVowel}>
             Vowel
           </Button>
 
-          <Button width="150px">
+          <Button width="150px" onClick={addConsonant}>
             Consonant
           </Button>
       </Flex>
@@ -101,6 +116,8 @@ function App() {
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
 
       <Input style={Styles} w="250px"></Input>
+
+      <Textarea>{guesses}</Textarea>
     </Box>
   )
 }

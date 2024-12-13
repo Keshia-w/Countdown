@@ -251,8 +251,10 @@ function App() {
 
         <Button
         marginTop="40px"
-          onClick={handleWordSubmit}
-          isDisabled={isRunning === false || currentWord.length === 0}
+        backgroundColor="green"
+        color="white"
+        onClick={handleWordSubmit}
+        isDisabled={isRunning === false || currentWord.length === 0}
         >
           Submit
         </Button>
@@ -277,7 +279,7 @@ function App() {
           <Text>Total Points: {points}</Text>
           <Text>Longest Word: {longestWord}</Text>
           <Button
-            marginTop="20px"
+            marginTop="120px"
             onClick={() => {
               onRoundEndClose();
               if (rounds < 4) {

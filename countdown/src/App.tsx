@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './App.css'
-import axios from 'axios'
+import axios from 'axios' 
 import {
   Box,
   Text,
   Button,
-  Grid,
   Flex,
   CircularProgress, 
   CircularProgressLabel,
@@ -19,7 +18,7 @@ import {
 import Letters from './Components/LetterCardComponent'
 
 const Styles = {
-  marginTop: "50px",
+  marginTop: "40px",
 
 }
 
@@ -29,7 +28,7 @@ function App() {
   ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", 
   "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
 
-  const guesses = [""];
+  //for popup modal
   const {isOpen, onOpen, onClose} = useDisclosure({ defaultIsOpen: true});
 
   //add letters function
@@ -80,22 +79,60 @@ function App() {
     }, 1000);
   };
 
-    //function to accumulate points
-    // const totalPoints = () => {
+  //guesses function
+  const [currentWord, setCurrentWord] = useState<string>("");
 
-    // }
+  const [guessedWords, setGuessedWords] = useState<string[]>([]);
 
-    //backend handling
-  // const [count, setCount] = useState(0)
+  const handleWordSubmit = async () => {
+    if (currentWord.length === 0 || !isValidWord(currentWord)) {
+      alert("Invalid word based on selected letters!");
+      setCurrentWord("");
+      return;
+    }
+  
+    const isRealWord = await checkWordValidity(currentWord);
+  
+    if (isRealWord) {
+      setGuessedWords([...guessedWords, currentWord]);
+      setPoints((prevPoints) => prevPoints + currentWord.length);
+    } else {
+      alert(`${currentWord} is not a valid word!`);
+    }
+  
+    setCurrentWord("");
+  };
 
-  // const fetchAPI = async () => {
-  //   const response = await axios.get("http://localhost:5050/api")
-  //   console.log(response.data.fruits)
-  // };
+  //word validation
+  const isValidWord = (word: string): boolean => {
+    const letterMap: { [key: string]: number } = {};
+    for (const letter of selectedLetters) {
+      letterMap[letter] = (letterMap[letter] || 0) + 1;
+    }
+  
+    for (const letter of word) {
+      if (!letterMap[letter] || letterMap[letter] <= 0) {
+        return false;
+      }
+      letterMap[letter]--;
+    }
+    return true;
+  };
 
-  // useEffect(() => {
-  //   fetchAPI();
-  // }, []);
+  const checkWordValidity = async (word: string): Promise<boolean> => {
+    try {
+      const response = await axios.get(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+      );
+      console.log("API response:", response.data);
+  
+      // Check if the response contains valid meanings
+      return Array.isArray(response.data) && response.data.length > 0;
+    } catch (error) {
+      console.error("Word not found:", word, error);
+      return false;
+    }
+  };
 
   return (
     <Box alignItems={"center"}>
@@ -103,7 +140,11 @@ function App() {
       {/* Learn how to play the game and start the first round */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent width="500px" height="300px" justifyContent={'space-between'} padding="30px">
+        <ModalContent 
+        width="500px" 
+        height="300px" 
+        justifyContent={'space-between'} 
+        padding="30px">
           
           <Text fontWeight="bold" fontSize="20px">Welcome to my coding test!</Text>
 
@@ -126,6 +167,8 @@ function App() {
       </Modal>
 
       <Text fontSize={"50px"} fontWeight={"larger"}>Countdown</Text>
+
+      <Text fontSize={"20px"} fontWeight={"md"}>Round: {rounds}</Text>
 
       <Flex justifyContent="center" gap ="20px" style={Styles}>
 
@@ -162,10 +205,34 @@ function App() {
       isDisabled={isRunning || rounds > 4}>Start Game!</Button>
 
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
+  
+      <Flex justifyContent="center" gap ="20px">
+        <Input 
+        style={Styles} 
+        w="250px" 
+        borderWidth={"3px"}   value={currentWord}
+        onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}></Input>
 
-      <Input style={Styles} w="250px" borderWidth={"3px"}></Input>
+        <Button
+        marginTop="40px"
+          onClick={handleWordSubmit}
+          isDisabled={isRunning === false || currentWord.length === 0}
+        >
+          Submit
+        </Button>
+      </Flex>
 
-      <Textarea marginTop="20px" borderWidth={"3px"}>{guesses}</Textarea>
+      <Text style={Styles}>Your guesses will display below: </Text>
+
+      <Textarea 
+      marginTop="20px" 
+      borderWidth={"3px"}
+      value={guessedWords.join("\n")}
+      isReadOnly></Textarea>
+
+      <Text fontSize="20px">
+        Total Points: {points}
+      </Text>
     </Box>
   )
 }

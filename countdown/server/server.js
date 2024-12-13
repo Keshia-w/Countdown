@@ -10,7 +10,7 @@ app.use(cors(corsOptions));
 //route for backend api
 
 app.get("/api", (req, res) => {
-    res.json({ fruits: ["banana", "apple", "orange"]})
+    
 });
 
 app.listen(5050, () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios' 
 import {
@@ -29,7 +29,7 @@ function App() {
   "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
 
   //for popup modal
-  const {isOpen, onOpen, onClose} = useDisclosure({ defaultIsOpen: true});
+  const {isOpen, onClose} = useDisclosure({ defaultIsOpen: true});
 
   //add letters function
   const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
@@ -53,7 +53,7 @@ function App() {
   const [progress, setProgress] = useState<number>(100);
   const [isRunning, setIsRunning] = useState<boolean>(false);
 
-  const [rounds, setRounds] = useState<number>(1);
+  const [rounds, setRounds] = useState<number>(0);
   const [points, setPoints] = useState<number>(0);  
 
   const timerFunction = () => {
@@ -69,12 +69,12 @@ function App() {
         clearInterval(interval);
         setIsRunning(false);
   
-        if (rounds < 4) {
-          setRounds(prevRounds => prevRounds + 1);
-          setTimer(60);  //reset timer
-          setProgress(100);  //reset progress
-          setSelectedLetters([]);  //clear selected letters
-        }
+        //find the longest word and open the modal
+        (async () => {
+          const longest = await findLongestWord();
+          setLongestWord(longest || "No valid words found!");
+          onRoundEndOpen();
+        })();
       }
     }, 1000);
   };
@@ -126,13 +126,70 @@ function App() {
       );
       console.log("API response:", response.data);
   
-      // Check if the response contains valid meanings
+      //check if the response contains valid meanings
       return Array.isArray(response.data) && response.data.length > 0;
     } catch (error) {
       console.error("Word not found:", word, error);
       return false;
     }
   };
+
+  //find and display longest possible word
+  const [longestWord, setLongestWord] = useState<string>("");
+
+  const findLongestWord = async () => {
+    try {
+      const response = await fetch("/words.txt");
+      const text = await response.text();
+      const words = text.split("\n");
+  
+      const letterMap: { [key: string]: number } = {};
+      for (const letter of selectedLetters) {
+        letterMap[letter] = (letterMap[letter] || 0) + 1;
+      }
+  
+      let longest = "";
+  
+      for (const word of words) {
+        if (canFormWord(word.toUpperCase(), letterMap) && word.length > longest.length) {
+          longest = word.toUpperCase();
+        }
+      }
+  
+      return longest || "No valid words found!";
+    } catch (error) {
+      console.error("Error fetching word list:", error);
+      return "Error loading word list!";
+    }
+  };
+  
+  const canFormWord = (word: string, letterMap: { [key: string]: number }) => {
+    const tempMap = { ...letterMap };
+    for (const letter of word) {
+      if (!tempMap[letter] || tempMap[letter] <= 0) {
+        return false;
+      }
+      tempMap[letter]--;
+    }
+    return true;
+  };
+
+  //end of round modal
+  const {
+    isOpen: isRoundEndOpen,
+    onOpen: onRoundEndOpen,
+    onClose: onRoundEndClose
+  } = useDisclosure({ defaultIsOpen: false });
+
+  useEffect(() => {
+    if (!isRunning && timer === 0) {
+      (async () => {
+        const longest = await findLongestWord();
+        setLongestWord(longest || "No valid words found!");
+        onRoundEndOpen();  //trigger the modal 
+      })();
+    }
+  }, [isRunning, timer]);
 
   return (
     <Box alignItems={"center"}>
@@ -157,12 +214,19 @@ function App() {
           <Text>3. Each correctly guessed word will accumulate points</Text>
           <Text>4. Play up to 4 rounds</Text>
 
-          <Button 
-          backgroundColor="green" 
-          color="white" 
-          width="120px" 
-          marginTop="10px" 
-          marginLeft="125px">Start round {rounds}</Button>
+          <Button
+            backgroundColor="green"
+            color="white"
+            width="120px"
+            marginTop="10px"
+            marginLeft="125px"
+            onClick={() => {
+              onClose();
+              setRounds(1);
+            }}
+          >
+            Start round {rounds + 1}
+          </Button>
         </ModalContent>
       </Modal>
 
@@ -180,7 +244,7 @@ function App() {
           color="green.400" 
           value={progress} 
           max={100}>
-          <CircularProgressLabel>{timer}</CircularProgressLabel>
+          <CircularProgressLabel></CircularProgressLabel>
         </CircularProgress>
       </Flex>
 
@@ -202,19 +266,28 @@ function App() {
       color="white" 
       width="150px"
       onClick={timerFunction}
-      isDisabled={isRunning || rounds > 4}>Start Game!</Button>
+      isDisabled={isRunning || rounds > 4}>Start!</Button>
 
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
   
-      <Flex justifyContent="center" gap ="20px">
-        <Input 
-        style={Styles} 
-        w="250px" 
-        borderWidth={"3px"}   value={currentWord}
-        onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}></Input>
-
+      <Flex justifyContent="center" gap="20px">
+        <Input
+          style={Styles}
+          w="250px"
+          borderWidth="3px"
+          value={currentWord}
+          onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleWordSubmit(); //trigger submit on Enter press
+            }
+          }}
+        />
+        
         <Button
-        marginTop="40px"
+          marginTop="40px"
+          backgroundColor="green"
+          color="white"
           onClick={handleWordSubmit}
           isDisabled={isRunning === false || currentWord.length === 0}
         >
@@ -233,6 +306,29 @@ function App() {
       <Text fontSize="20px">
         Total Points: {points}
       </Text>
+
+      <Modal isOpen={isRoundEndOpen} onClose={onRoundEndClose}>
+        <ModalOverlay />
+        <ModalContent width="500px" height="300px" padding="20px">
+          <Text fontSize="20px" fontWeight="bold">Round {rounds - 1} Results</Text>
+          <Text>Total Points: {points}</Text>
+          <Text>Longest Word: {longestWord}</Text>
+          <Button
+            marginTop="120px"
+            onClick={() => {
+              onRoundEndClose();
+              if (rounds < 4) {
+                setRounds(rounds + 1);
+                setSelectedLetters([]);
+                setTimer(60);
+                setProgress(100);
+              }
+            }}
+          >
+            {rounds < 4 ? "Start Next Round" : "Game Over"}
+          </Button>
+        </ModalContent>
+      </Modal>
     </Box>
   )
 }

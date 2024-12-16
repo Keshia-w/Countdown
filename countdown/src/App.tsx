@@ -69,7 +69,7 @@ function App() {
         clearInterval(interval);
         setIsRunning(false);
   
-        // Find the longest word and open the modal
+        //find the longest word and open the modal
         (async () => {
           const longest = await findLongestWord();
           setLongestWord(longest || "No valid words found!");
@@ -126,7 +126,7 @@ function App() {
       );
       console.log("API response:", response.data);
   
-      // Check if the response contains valid meanings
+      //check if the response contains valid meanings
       return Array.isArray(response.data) && response.data.length > 0;
     } catch (error) {
       console.error("Word not found:", word, error);
@@ -158,7 +158,7 @@ function App() {
       (async () => {
         const longest = await findLongestWord();
         setLongestWord(longest || "No valid words found!");
-        onRoundEndOpen();  // Trigger the round-end modal
+        onRoundEndOpen();  //trigger the round-end modal
       })();
     }
   }, [isRunning, timer]);
@@ -242,19 +242,26 @@ function App() {
 
       <Text style={Styles}>Enter all the words you can make from the letters!</Text>
   
-      <Flex justifyContent="center" gap ="20px">
-        <Input 
-        style={Styles} 
-        w="250px" 
-        borderWidth={"3px"}   value={currentWord}
-        onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}></Input>
-
+      <Flex justifyContent="center" gap="20px">
+        <Input
+          style={Styles}
+          w="250px"
+          borderWidth="3px"
+          value={currentWord}
+          onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleWordSubmit(); //trigger submit on Enter press
+            }
+          }}
+        />
+        
         <Button
-        marginTop="40px"
-        backgroundColor="green"
-        color="white"
-        onClick={handleWordSubmit}
-        isDisabled={isRunning === false || currentWord.length === 0}
+          marginTop="40px"
+          backgroundColor="green"
+          color="white"
+          onClick={handleWordSubmit}
+          isDisabled={isRunning === false || currentWord.length === 0}
         >
           Submit
         </Button>

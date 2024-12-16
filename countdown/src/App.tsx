@@ -138,15 +138,43 @@ function App() {
   const [longestWord, setLongestWord] = useState<string>("");
 
   const findLongestWord = async () => {
-    let longest = "";
-    for (const word of guessedWords) {
-      if (word.length > longest.length) {
-        longest = word;
+    try {
+      const response = await fetch("/words.txt");
+      const text = await response.text();
+      const words = text.split("\n");
+  
+      const letterMap: { [key: string]: number } = {};
+      for (const letter of selectedLetters) {
+        letterMap[letter] = (letterMap[letter] || 0) + 1;
       }
+  
+      let longest = "";
+  
+      for (const word of words) {
+        if (canFormWord(word.toUpperCase(), letterMap) && word.length > longest.length) {
+          longest = word.toUpperCase();
+        }
+      }
+  
+      return longest || "No valid words found!";
+    } catch (error) {
+      console.error("Error fetching word list:", error);
+      return "Error loading word list!";
     }
-    return longest;
+  };
+  
+  const canFormWord = (word: string, letterMap: { [key: string]: number }) => {
+    const tempMap = { ...letterMap };
+    for (const letter of word) {
+      if (!tempMap[letter] || tempMap[letter] <= 0) {
+        return false;
+      }
+      tempMap[letter]--;
+    }
+    return true;
   };
 
+  //end of round modal
   const {
     isOpen: isRoundEndOpen,
     onOpen: onRoundEndOpen,
@@ -158,7 +186,7 @@ function App() {
       (async () => {
         const longest = await findLongestWord();
         setLongestWord(longest || "No valid words found!");
-        onRoundEndOpen();  //trigger the round-end modal
+        onRoundEndOpen();  //trigger the modal 
       })();
     }
   }, [isRunning, timer]);

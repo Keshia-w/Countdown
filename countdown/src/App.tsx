@@ -310,7 +310,7 @@ function App() {
       <Modal isOpen={isRoundEndOpen} onClose={onRoundEndClose}>
         <ModalOverlay />
         <ModalContent width="500px" height="300px" padding="20px">
-          <Text fontSize="20px" fontWeight="bold">Round {rounds - 1} Results</Text>
+          <Text fontSize="20px" fontWeight="bold">Round {rounds} Results</Text>
           <Text>Total Points: {points}</Text>
           <Text>Longest Word: {longestWord}</Text>
           <Button

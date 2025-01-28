@@ -13,6 +13,6 @@ app.get("/api", (req, res) => {
     
 });
 
-app.listen(5050, () => {
+app.listen(8080, () => {
     console.log("Sever running on port 5050")
 })

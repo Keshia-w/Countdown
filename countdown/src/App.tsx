@@ -279,7 +279,7 @@ function App() {
           onChange={(e) => setCurrentWord(e.target.value.toUpperCase())}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleWordSubmit(); //trigger submit on Enter press
+              handleWordSubmit();
             }
           }}
         />
